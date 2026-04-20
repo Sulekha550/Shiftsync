@@ -1,0 +1,95 @@
+{
+  "info": {
+    "name": "ShiftSync API",
+    "description": "Complete API collection for ShiftSync — Employee Shift Scheduling & Attendance Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000/api" },
+    { "key": "access_token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST", "url": "{{base_url}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@shiftsync.com\",\n  \"password\": \"test123\",\n  \"role\": \"employee\"\n}" }
+          }
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if(r.data?.accessToken) pm.collectionVariables.set('access_token', r.data.accessToken);"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST", "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@shiftsync.com\",\n  \"password\": \"admin123\"\n}" }
+          }
+        },
+        {
+          "name": "Login (Manager)",
+          "request": {
+            "method": "POST", "url": "{{base_url}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"sarah@shiftsync.com\",\n  \"password\": \"manager123\"\n}" }
+          }
+        },
+        {
+          "name": "Login (Employee)",
+          "request": {
+            "method": "POST", "url": "{{base_url}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"alice@shiftsync.com\",\n  \"password\": \"emp123\"\n}" }
+          }
+        },
+        { "name": "Get Me", "request": { "method": "GET", "url": "{{base_url}}/auth/me", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Refresh Token", "request": { "method": "POST", "url": "{{base_url}}/auth/refresh" } },
+        { "name": "Logout", "request": { "method": "POST", "url": "{{base_url}}/auth/logout", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        { "name": "Get All Employees", "request": { "method": "GET", "url": { "raw": "{{base_url}}/employees?page=1&limit=10", "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }, { "key": "search", "value": "", "disabled": true }, { "key": "department", "value": "", "disabled": true }, { "key": "status", "value": "active", "disabled": true }] }, "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Get Employee Stats", "request": { "method": "GET", "url": "{{base_url}}/employees/stats", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Create Employee", "request": { "method": "POST", "url": "{{base_url}}/employees", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Employee\",\n  \"email\": \"newemployee@shiftsync.com\",\n  \"department\": \"Engineering\",\n  \"branch\": \"New York\",\n  \"designation\": \"Developer\",\n  \"joiningDate\": \"2024-01-15\",\n  \"status\": \"active\",\n  \"salary\": 55000\n}" } } },
+        { "name": "Update Employee", "request": { "method": "PUT", "url": "{{base_url}}/employees/:id", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"designation\": \"Senior Developer\",\n  \"salary\": 70000\n}" } } },
+        { "name": "Delete Employee", "request": { "method": "DELETE", "url": "{{base_url}}/employees/:id", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } }
+      ]
+    },
+    {
+      "name": "Shifts",
+      "item": [
+        { "name": "Get All Shifts", "request": { "method": "GET", "url": "{{base_url}}/shifts?page=1&limit=10", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Get My Shifts", "request": { "method": "GET", "url": "{{base_url}}/shifts/my", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Create Shift", "request": { "method": "POST", "url": "{{base_url}}/shifts", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"employee\": \"EMPLOYEE_ID_HERE\",\n  \"shiftDate\": \"2024-12-25\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"17:00\",\n  \"branch\": \"New York\",\n  \"notes\": \"Holiday shift\"\n}" } } },
+        { "name": "Update Shift", "request": { "method": "PUT", "url": "{{base_url}}/shifts/:id", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"completed\"\n}" } } },
+        { "name": "Cancel Shift", "request": { "method": "DELETE", "url": "{{base_url}}/shifts/:id", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        { "name": "Check In", "request": { "method": "POST", "url": "{{base_url}}/attendance/checkin", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{}" } } },
+        { "name": "Check Out", "request": { "method": "POST", "url": "{{base_url}}/attendance/checkout", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{}" } } },
+        { "name": "Get Today Status", "request": { "method": "GET", "url": "{{base_url}}/attendance/today", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Get My Attendance", "request": { "method": "GET", "url": "{{base_url}}/attendance/my?page=1&limit=10", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Get All Attendance (Admin)", "request": { "method": "GET", "url": "{{base_url}}/attendance?page=1&limit=10", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Get Attendance Stats", "request": { "method": "GET", "url": "{{base_url}}/attendance/stats", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } }
+      ]
+    },
+    {
+      "name": "Leaves",
+      "item": [
+        { "name": "Apply for Leave", "request": { "method": "POST", "url": "{{base_url}}/leaves", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"leaveType\": \"casual\",\n  \"startDate\": \"2024-12-26\",\n  \"endDate\": \"2024-12-27\",\n  \"reason\": \"Personal family commitments that require my presence at home during this period.\"\n}" } } },
+        { "name": "Get My Leaves", "request": { "method": "GET", "url": "{{base_url}}/leaves/my?page=1&limit=10", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Get All Leaves (Manager)", "request": { "method": "GET", "url": "{{base_url}}/leaves?page=1&limit=10&status=pending", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Review Leave (Approve)", "request": { "method": "PATCH", "url": "{{base_url}}/leaves/:id/review", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"approved\",\n  \"reviewNote\": \"Approved. Enjoy your time off!\"\n}" } } },
+        { "name": "Review Leave (Reject)", "request": { "method": "PATCH", "url": "{{base_url}}/leaves/:id/review", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"rejected\",\n  \"reviewNote\": \"Insufficient team coverage during this period.\"\n}" } } },
+        { "name": "Cancel Leave", "request": { "method": "PATCH", "url": "{{base_url}}/leaves/:id/cancel", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } },
+        { "name": "Get Leave Stats", "request": { "method": "GET", "url": "{{base_url}}/leaves/stats", "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }] } }
+      ]
+    }
+  ]
+}
